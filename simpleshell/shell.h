@@ -10,19 +10,20 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <errno.h>
-#define READ_BUF_SIZE   1024
-#define WRITE_BUF_SIZE  1024
-#define BUF_FLUSH       -1
+#define READ_BUF_SIZE	1024
+#define WRITE_BUF_SIZE	1024
+#define BUF_FLUSH	-1
 #define CMD_NORM	0
 #define CMD_OR		1
 #define CMD_AND		2
 #define CMD_CHAIN	3
 #define CONVERT_LOWERCASE	1
 #define CONVERT_UNSIGNED	2
-#define USE_GETLINE 0
-#define USE_STRTOK  0
+#define USE_GETLINE	0
+#define USE_STRTOK	0
 #define HIST_FILE	".simple_shell_history"
 #define HIST_MAX	4096
+
 extern char **environ;
 
 /**
@@ -64,13 +65,24 @@ typedef struct liststr
 
 typedef struct passinfo
 {
-	char *arg, **argv, *path, *fname, **environ, **cmd_buf;
+	char *arg;
+	char **argv;
+	char *path;
+	int argc;
 	unsigned int line_count;
-	int err_num, linecount_flag;
+	int err_num;
+	int linecount_flag;
+	char *fname;
 	list_t *env;
 	list_t *history;
 	list_t *alias;
-	int env_changed, status, cmd_buf_type, readfd, histcount, argc;
+	char **environ;
+	int env_changed;
+	int status;
+	char **cmd_buf;
+	int cmd_buf_type;
+	int readfd;
+	int histcount;
 } info_t;
 
 #define INFO_INIT \
@@ -78,9 +90,9 @@ typedef struct passinfo
 		0, 0, 0}
 
 /**
- * struct builtin - represents a builtin command and its related function
+ * struct builtin - contains a builtin string and related function
  * @type: the builtin command flag
- * @func: points to the builtin function
+ * @func: the function
  */
 
 typedef struct builtin
@@ -89,7 +101,8 @@ typedef struct builtin
 	int (*func)(info_t *);
 } builtin_table;
 
-int hsh(info_t *, char **), find_builtin(info_t *);
+int hsh(info_t *, char **);
+int find_builtin(info_t *);
 void find_cmd(info_t *);
 void fork_cmd(info_t *);
 int is_cmd(info_t *, char *);
