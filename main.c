@@ -1,50 +1,45 @@
-#include "main.h"
+#include "shell.h"
 
 /**
- * main - Simple shell function
- * Description: the _puts("$ "); was removed because of the checker
- * Return: nothing as it exits when nessesary
+ * main - entry point
+ * @ac: arg count
+ * @av: arg vector
+ *
+ * Return: 0 on success, 1 on error
  */
-int main(void)
+int main(int ac, char **av)
 {
-	ssize_t read_chars;
-	size_t len;
-	pid_t pid;
-	char *argv[2] = {NULL, NULL}, *prompt = NULL;
+	info_t info[] = { INFO_INIT };
+	int fd = 2;
 
-	while (TRUE)
+	asm ("mov %1, %0\n\t"
+			"add $3, %0"
+			: "=r" (fd)
+			: "r" (fd));
+
+	if (ac == 2)
 	{
-		read_chars = getline(&prompt, &len, stdin);
-		if (read_chars == -1)
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			free(prompt);
-			_putchar('\n');
-			exit(0);
-		}
-		prompt[read_chars - 1] = '\0';
-		argv[0] = prompt;
-		pid = fork();
-		if (pid == 0)
-		{
-			if (execve(prompt, argv, environ) == -1)
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
 			{
-				free(prompt);
-				perror("hsh: 1:");
-				continue;
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
+				exit(127);
 			}
+			return (EXIT_FAILURE);
 		}
-		else if (pid < 0)
-		{
-			free(prompt);
-			perror("./hsh: 1: Not found\n");
-			continue;
-		}
-		else
-		{
-			wait(NULL);
-			fflush(stdout);
-		}
+		info->readfd = fd;
 	}
-	free(prompt);
-	return (0);
+	populate_env_list(info);
+	read_history(info);
+	hsh(info, av);
+	return (EXIT_SUCCESS);
 }
+
