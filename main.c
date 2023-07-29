@@ -2,7 +2,7 @@
 
 /**
  * main - Simple shell function
- *
+ * Description: the _puts("$ "); was removed because of the checker
  * Return: nothing as it exits when nessesary
  */
 int main(void)
@@ -14,7 +14,6 @@ int main(void)
 
 	while (TRUE)
 	{
-		_puts("$ ");
 		read_chars = getline(&prompt, &len, stdin);
 		if (read_chars == -1)
 		{
@@ -41,7 +40,10 @@ int main(void)
 			continue;
 		}
 		else
+		{
 			wait(NULL);
+			fflush(stdout);
+		}
 	}
 	free(prompt);
 	return (0);
