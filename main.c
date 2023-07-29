@@ -41,7 +41,10 @@ int main(void)
 			continue;
 		}
 		else
+		{
 			wait(NULL);
+			fflush(stdout);
+		}
 	}
 	free(prompt);
 	return (0);
