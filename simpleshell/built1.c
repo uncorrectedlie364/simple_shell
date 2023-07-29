@@ -57,7 +57,8 @@ int _mycd(info_t *info)
 	{
 		dir = info->argv[1];
 	}
-	int chdir_ret = chdir(dir);
+	int chdir_ret;
+       chdir_ret = chdir(dir);
 
 	if (chdir_ret == -1)
 	{
